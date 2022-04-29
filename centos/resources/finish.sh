@@ -19,8 +19,8 @@ fi
 export PGPASSWORD=$database_password
 
 #update the database password
-sudo -u postgres /usr/pgsql-9.6/bin/psql -c "ALTER USER fusionpbx WITH PASSWORD '$database_password';"
-sudo -u postgres /usr/pgsql-9.6/bin/psql -c "ALTER USER freeswitch WITH PASSWORD '$database_password';"
+sudo -u postgres /usr/bin/psql -c "ALTER USER fusionpbx WITH PASSWORD '$database_password';"
+sudo -u postgres /usr/bin/psql -c "ALTER USER freeswitch WITH PASSWORD '$database_password';"
 
 #add the config.php
 mkdir -p /etc/fusionpbx
@@ -113,8 +113,10 @@ systemctl enable php-fpm
 systemctl enable nginx
 systemctl enable freeswitch
 systemctl enable memcached
-systemctl enable postgresql-9.6
+systemctl enable postgresql-14
 systemctl daemon-reload
+systemctl restart php-fpm
+systemctl restart nginx
 systemctl restart freeswitch
 
 #welcome message
@@ -135,9 +137,9 @@ echo "      Fastest way to learn FusionPBX. For more information https://www.fus
 echo "      Available online and in person. Includes documentation and recording."
 echo ""
 echo "      Location:               Online"
-echo "      Admin Training:          TBA"
-echo "      Advanced Training:       TBA"
-echo "      Continuing Education:    17th December 2020 (1 Day)"
+echo "      Admin Training:         TBA"
+echo "      Advanced Training:      TBA"
+echo "      Continuing Education:   https://www.fusionpbx.com/training"
 echo "      Timezone:               https://www.timeanddate.com/weather/usa/idaho"
 echo ""
 echo "   Additional information."

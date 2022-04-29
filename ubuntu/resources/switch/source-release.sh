@@ -15,13 +15,54 @@ apt install -y autoconf automake devscripts g++ git-core libncurses5-dev libtool
   liblua5.2-dev libtiff5-dev libperl-dev libcurl4-openssl-dev libsqlite3-dev libpcre3-dev \
   devscripts libspeexdsp-dev libspeex-dev libldns-dev libedit-dev libopus-dev libmemcached-dev \
   libshout3-dev libmpg123-dev libmp3lame-dev yasm nasm libsndfile1-dev libuv1-dev libvpx-dev \
-  libavformat-dev libswscale-dev libspandsp-dev
+  libavformat-dev libswscale-dev libspandsp-dev pip libpq-dev libvlc-dev
 
 # additional dependencies
 apt install -y swig3.0 unzip sox wget
 
 #we are about to move out of the executing directory so we need to preserve it to return after we are done
 CWD=$(pwd)
+
+if [ $(echo "$switch_version" | tr -d '.') -gt 1103 ]
+then
+# libks build-requirements
+#apt install -y cmake uuid-dev
+
+# libks
+#cd /usr/src
+#git clone https://github.com/signalwire/libks.git libks
+#cd libks
+#cmake .
+#make
+#make install
+
+# libks C includes
+#export C_INCLUDE_PATH=/usr/include/libks
+
+# sofia-sip
+cd /usr/src
+#git clone https://github.com/freeswitch/sofia-sip.git sofia-sip
+wget https://github.com/freeswitch/sofia-sip/archive/refs/tags/v$sofia_version.zip
+unzip v$sofia_version.zip
+rm -R sofia-sip
+mv sofia-sip-$sofia_version sofia-sip
+cd sofia-sip
+sh autogen.sh
+./configure
+make
+make install
+
+# spandsp
+cd /usr/src
+git clone https://github.com/freeswitch/spandsp.git spandsp
+cd spandsp
+sh autogen.sh
+./configure
+make
+make install
+ldconfig
+fi
+
 echo "Using version $switch_version"
 cd /usr/src
 #git clone -b v1.8 https://freeswitch.org/stash/scm/fs/freeswitch.git /usr/src/freeswitch
@@ -48,6 +89,7 @@ sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_memcache:applica
 sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_curl:applications/mod_curl:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#formats/mod_shout:formats/mod_shout:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#formats/mod_pgsql:formats/mod_pgsql:'
+sed -i /usr/src/freeswitch/modules.conf -e s:'endpoints/mod_verto:#endpoints/mod_verto:'
 #sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_avmd:applications/mod_avmd:'
 
 #disable module or install dependency libks to compile signalwire

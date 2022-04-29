@@ -74,14 +74,14 @@ fi
 #iptables rules
 if [ .$iptables_add = ."y" ]; then
 	for node in $nodes; do
-		iptables -A INPUT -j ACCEPT -p tcp --dport 5432 -s ${node}/32
-		iptables -A INPUT -j ACCEPT -p tcp --dport 22000 -s ${node}/32
+		/usr/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 5432 -s ${node}/32
+		/usr/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 22000 -s ${node}/32
 	done
 	apt-get remove iptables-persistent -y
 	echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 	echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
 	apt-get install -y iptables-persistent
-	service fail2ban restart
+	systemctl restart fail2ban
 fi
 
 #setup ssl
@@ -117,11 +117,15 @@ for node in $nodes; do
         echo "hostssl replication     postgres       ${node}/32              trust" >> /etc/postgresql/$database_version/main/pg_hba.conf
 done
 
+
 #reload configuration
 systemctl daemon-reload
 
+#reload the config
+sudo -u postgres psql -p $database_port -c "SELECT pg_reload_conf();"
+
 #restart postgres
-service postgresql restart
+systemctl restart postgresql
 
 #set the working directory
 cwd=$(pwd)

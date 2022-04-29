@@ -3,6 +3,7 @@
 #move to script directory so all relative paths work
 cd "$(dirname "$0")"
 
+
 #add the includes
 . ./config.sh
 . ./colors.sh
@@ -16,6 +17,17 @@ if [ ."$os_codename" = ."buster" ]; then
 	update-alternatives --set iptables /usr/sbin/iptables-legacy
 	update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 fi
+if [ ."$os_codename" = ."bullseye" ]; then
+	apt-get install -y iptables
+	update-alternatives --set iptables /usr/sbin/iptables-legacy
+	update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+fi
+
+#remove ufw
+ufw reset
+ufw disable
+apt-get remove -y ufw
+#apt-get purge ufw
 
 #run iptables commands
 iptables -A INPUT -i lo -j ACCEPT

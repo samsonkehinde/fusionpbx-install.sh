@@ -11,10 +11,13 @@ cd "$(dirname "$0")"
 #includes
 . ./config.sh
 
+#Add dependencies
+apt-get install -y curl
+
 #remove dehyrdated letsencrypt script
+rm /usr/local/sbin/dehydrated
+rm -R /usr/src/dehydrated
 #rm -R /etc/dehydrated/
-#rm /usr/local/sbin/dehydrated
-#rm -R /usr/src/dehydrated
 #rm -R /usr/src/dns-01-manual
 #rm -R /var/www/dehydrated
 
@@ -79,18 +82,18 @@ fi
 
 #request the certificates
 if [ .$wildcard_domain = ."true" ]; then
-	./dehydrated --cron --domain *.$domain_name --alias $domain_alias --config /etc/dehydrated/config --out /etc/dehydrated/certs --challenge dns-01 --hook /etc/dehydrated/hook.sh
+	./dehydrated --cron --domain *.$domain_name --preferred-chain "ISRG Root X1" --algo rsa --alias $domain_alias --config /etc/dehydrated/config --out /etc/dehydrated/certs --challenge dns-01 --hook /etc/dehydrated/hook.sh
 fi
 if [ .$wildcard_domain = ."false" ]; then
-	./dehydrated --cron --alias $domain_alias --config /etc/dehydrated/config --config /etc/dehydrated/config --out /etc/dehydrated/certs --challenge http-01
+	./dehydrated --cron --alias $domain_alias --preferred-chain "ISRG Root X1" --algo rsa --config /etc/dehydrated/config --config /etc/dehydrated/config --out /etc/dehydrated/certs --challenge http-01
 fi
 
 #make sure the nginx ssl directory exists
 mkdir -p /etc/nginx/ssl
 
 #update nginx config
-sed "s@ssl_certificate         /etc/ssl/certs/nginx.crt;@ssl_certificate /etc/dehydrated/certs/$domain_alias/fullchain.pem;@g" -i /etc/nginx/sites-available/fusionpbx
-sed "s@ssl_certificate_key     /etc/ssl/private/nginx.key;@ssl_certificate_key /etc/dehydrated/certs/$domain_alias/privkey.pem;@g" -i /etc/nginx/sites-available/fusionpbx
+sed "s@ssl_certificate[ \t]*/etc/ssl/certs/nginx.crt;@ssl_certificate /etc/dehydrated/certs/$domain_alias/fullchain.pem;@g" -i /etc/nginx/sites-available/fusionpbx
+sed "s@ssl_certificate_key[ \t]*/etc/ssl/private/nginx.key;@ssl_certificate_key /etc/dehydrated/certs/$domain_alias/privkey.pem;@g" -i /etc/nginx/sites-available/fusionpbx
 
 #read the config
 /usr/sbin/nginx -t && /usr/sbin/nginx -s reload

@@ -95,7 +95,7 @@ sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_user}:$xml_cdr
 sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_pass}:$xml_cdr_password:"
 
 #app defaults
-cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
+cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade.php
 
 #restart freeswitch
 /bin/systemctl daemon-reload
@@ -104,7 +104,9 @@ cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
 #welcome message
 echo ""
 echo ""
-verbose "Installation has completed."
+verbose "Installation Notes. "
+echo ""
+echo "   Please save the this information and reboot this system to complete the install. "
 echo ""
 echo "   Use a web browser to login."
 echo "      domain name: https://$domain_name"
@@ -122,7 +124,7 @@ echo ""
 echo "      Location:               Online"
 echo "      Admin Training:          TBA"
 echo "      Advanced Training:       TBA"
-echo "      Continuing Education:    17th December 2020 (1 Day)"
+echo "      Continuing Education:   https://www.fusionpbx.com/training"
 echo "      Timezone:               https://www.timeanddate.com/weather/usa/idaho"
 echo ""
 echo "   Additional information."
